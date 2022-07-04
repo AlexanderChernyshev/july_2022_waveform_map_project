@@ -2,6 +2,10 @@ class Tile {
     constructor(id, image) {
         this.id = id;
         this.image = image;
+        this.north = [];
+        this.west = [];
+        this.east = [];
+        this.south = [];
     }
 }
 
@@ -34,12 +38,12 @@ let example_map = [
 
 function generateMap(map) {
     const output = document.getElementById("generated-map");
-    for (let row = 0; row < map.length; row++) {
+    for (let rowIndex = 0; rowIndex < map.length; rowIndex++) {
         const rowEl = document.createElement("div");
         rowEl.classList.add("row")
-        for (let cell = 0; cell < map[row].length; cell++) {
+        for (let cellIndex = 0; cellIndex < map[rowIndex].length; cellIndex++) {
             const imageEl = document.createElement("img");
-            const tileId = map[row][cell];
+            const tileId = map[rowIndex][cellIndex];
             imageEl.setAttribute("src", `tiles/${tiles[tileId].image}`);
             rowEl.appendChild(imageEl);
         }
@@ -47,5 +51,43 @@ function generateMap(map) {
     }
 }
 
+function trainTileSet(map, tiles) {
+
+    for (let rowIndex = 0; rowIndex < map.length; rowIndex++) {
+
+        for (let cellIndex = 0; cellIndex < map[rowIndex].length; cellIndex++) {
+            let currentId = map[rowIndex][cellIndex];
+            let currenttile = tiles[currentId];
+
+            if (rowIndex > 0) {
+                let northId = map[rowIndex - 1][cellIndex];
+                currenttile.north.push(northId);
+            }
+
+            if (cellIndex > 0) {
+                let westId = map[rowIndex][cellIndex - 1];
+                currenttile.west.push(westId);
+            }
+
+            if (cellIndex < map[rowIndex].length - 1) {
+                let eastId = map[rowIndex][cellIndex + 1];
+                currenttile.east.push(eastId);
+            }
+
+            if (rowIndex < map.length - 1) {
+                let southId = map[rowIndex + 1][cellIndex];
+                currenttile.south.push(southId);
+            }
+
+        }
+
+    }
+
+}
+
+
+
+trainTileSet(example_map, tiles);
 generateMap(example_map);
-generateMap(example_map);
+
+console.log(tiles);
