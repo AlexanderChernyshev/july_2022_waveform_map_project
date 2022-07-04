@@ -48,3 +48,4 @@ function generateMap(map) {
 }
 
 generateMap(example_map);
+generateMap(example_map);

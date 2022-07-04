@@ -1,6 +1,17 @@
+body {
+    background-color: rgb(21, 21, 21);
+}
+
 .row {
+    display: flex;
     margin: 0;
     padding: 0;
     border: 0;
     height: 151px;
+    justify-content: center;
 }
+
+#generated-map {
+    margin: 10%;
+}
+
