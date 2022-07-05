@@ -15,3 +15,8 @@ body {
     margin: 10%;
 }
 
+.blank { 
+    width: 151px;
+    height: 151px;
+    background-color: rgb(125, 123, 130);
+}

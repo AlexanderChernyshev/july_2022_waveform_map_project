@@ -102,6 +102,11 @@ let example_map_2 = [
     [new Cell("sky"), new Cell("leftstairs"), new Cell("windows"), new Cell("block"), new Cell("windows"), new Cell("block"), new Cell("rightslope"), new Cell("clouds")],
     [new Cell("block"), new Cell("windows"), new Cell("windows"), new Cell("ornatewindow"), new Cell("windows"), new Cell("windows"), new Cell("windows"), new Cell("rightslope")]
 ];
+let example_map_3 = [
+    [new Cell("sky"), new Cell(), new Cell()],
+    [new Cell("sky"), new Cell("sky"), new Cell("clouds")],
+    [new Cell(), new Cell("sky"), new Cell("sky")],
+];
 
 function generateMap(map) {
     const output = document.getElementById("generated-map");
@@ -109,10 +114,18 @@ function generateMap(map) {
         const rowEl = document.createElement("div");
         rowEl.classList.add("row")
         for (let cellIndex = 0; cellIndex < map[rowIndex].length; cellIndex++) {
-            const imageEl = document.createElement("img");
-            const tileId = map[rowIndex][cellIndex].tileId;
-            imageEl.setAttribute("src", `tiles/${tileset.tiles[tileId].image}`);
-            rowEl.appendChild(imageEl);
+            const cell = map[rowIndex][cellIndex];
+            if (cell.resolved) {
+                const imageEl = document.createElement("img");
+                const tileId = cell.tileId;
+                imageEl.setAttribute("src", `tiles/${tileset.tiles[tileId].image}`);
+                rowEl.appendChild(imageEl);
+            }
+            else {
+                const divEl = document.createElement("div");
+                divEl.setAttribute("class", "blank")
+                rowEl.appendChild(divEl);
+            }
         }
         output.appendChild(rowEl);
     }
@@ -120,6 +133,6 @@ function generateMap(map) {
 
 tileset.train(example_map);
 tileset.train(example_map_2);
-generateMap(example_map);
-generateMap(example_map_2);
+generateMap(example_map_3);
+
 
