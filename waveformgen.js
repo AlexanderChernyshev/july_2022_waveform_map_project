@@ -23,7 +23,11 @@ class Tileset {
         for (let rowIndex = 0; rowIndex < map.length; rowIndex++) {
 
             for (let cellIndex = 0; cellIndex < map[rowIndex].length; cellIndex++) {
-                let currentId = map[rowIndex][cellIndex].tileId;
+                const currentcell = map[rowIndex][cellIndex];
+                if (!currentcell.resolved) {
+                    continue;
+                }
+                let currentId = currentcell.tileId;
                 let currenttile = this.tiles[currentId];
 
                 if (rowIndex > 0) {
@@ -87,7 +91,7 @@ tileset.add(new Tile("rightstairs", "rightstairstile.png"));
 tileset.add(new Tile("windows", "windowstile.png"));
 
 let example_map = [
-    [new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("clouds"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("sky")],
+    [new Cell("sky"), new Cell(), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("clouds"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("sky")],
     [new Cell("sky"), new Cell("sky"), new Cell("clouds"), new Cell("sky"), new Cell("column"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("clouds"), new Cell("sky"), new Cell("sky")],
     [new Cell("clouds"), new Cell("sky"), new Cell("sky"), new Cell("leftstairs"), new Cell("block"), new Cell("rightstairs"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("leftsmallslope"), new Cell("potslab")],
     [new Cell("sky"), new Cell("sky"), new Cell("leftslope"), new Cell("block"), new Cell("ornatewindow"), new Cell("block"), new Cell("rightstairs"), new Cell("sky"), new Cell("leftslope"), new Cell("block"), new Cell("windows")],
@@ -98,7 +102,7 @@ let example_map_2 = [
     [new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("clouds"), new Cell("sky"), new Cell("sky"), new Cell("sky")],
     [new Cell("sky"), new Cell("sky"), new Cell("clouds"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("clouds"), new Cell("sky")],
     [new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("sky"), new Cell("sky"),],
-    [new Cell("sky"), new Cell("clouds"), new Cell("column"), new Cell("column"), new Cell("column"), new Cell("clouds"), new Cell("sky"), new Cell("sky")],
+    [new Cell("sky"), new Cell(), new Cell("column"), new Cell("column"), new Cell("column"), new Cell("clouds"), new Cell("sky"), new Cell("sky")],
     [new Cell("sky"), new Cell("leftstairs"), new Cell("windows"), new Cell("block"), new Cell("windows"), new Cell("block"), new Cell("rightslope"), new Cell("clouds")],
     [new Cell("block"), new Cell("windows"), new Cell("windows"), new Cell("ornatewindow"), new Cell("windows"), new Cell("windows"), new Cell("windows"), new Cell("rightslope")]
 ];
@@ -109,6 +113,8 @@ let example_map_3 = [
 ];
 
 function generateMap(map) {
+    const mapEl = document.createElement("div");
+    mapEl.setAttribute("class", "map");
     const output = document.getElementById("generated-map");
     for (let rowIndex = 0; rowIndex < map.length; rowIndex++) {
         const rowEl = document.createElement("div");
@@ -127,12 +133,15 @@ function generateMap(map) {
                 rowEl.appendChild(divEl);
             }
         }
-        output.appendChild(rowEl);
+        mapEl.appendChild(rowEl);
     }
+    output.appendChild(mapEl);
 }
 
 tileset.train(example_map);
 tileset.train(example_map_2);
+generateMap(example_map);
+generateMap(example_map_2);
 generateMap(example_map_3);
 
 
