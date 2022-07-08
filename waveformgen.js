@@ -150,10 +150,21 @@ function generateMap(map) {
     output.appendChild(mapEl);
 }
 
+function growmap(numxtiles, numytiles, tileset) {
+    let outputmap = [];
+
+    for (y = 0; y < numytiles; y++) {
+        let rowarray = [];
+        outputmap.push(rowarray);
+        for (x = 0; x < numxtiles; x++) {
+            rowarray.push(new Cell(tileset));
+        }
+    }
+    return outputmap;
+}
+
+let unresolved_map = growmap(50, 30, tileset);
+
 tileset.train(example_map);
 tileset.train(example_map_2);
-generateMap(example_map);
-generateMap(example_map_2);
-generateMap(example_map_3);
-
-
+generateMap(unresolved_map);
