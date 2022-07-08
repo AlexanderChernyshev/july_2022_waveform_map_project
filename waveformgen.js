@@ -76,6 +76,57 @@ class Cell {
     }
 }
 
+class Worldmap {
+    constructor(numxtiles, numytiles, tileset) {
+
+        let outputmap = [];
+
+        for (let y = 0; y < numytiles; y++) {
+            let rowarray = [];
+            outputmap.push(rowarray);
+            for (let x = 0; x < numxtiles; x++) {
+                rowarray.push(new Cell(tileset));
+            }
+        }
+        this.cells = outputmap;
+    }
+
+    display() {
+        let map = this.cells;
+        const mapEl = document.createElement("div");
+        mapEl.setAttribute("class", "map");
+        const output = document.getElementById("generated-map");
+        for (let rowIndex = 0; rowIndex < map.length; rowIndex++) {
+            const rowEl = document.createElement("div");
+            rowEl.classList.add("row")
+            for (let cellIndex = 0; cellIndex < map[rowIndex].length; cellIndex++) {
+                const cell = map[rowIndex][cellIndex];
+                if (cell.resolved) {
+                    const imageEl = document.createElement("img");
+                    const tileId = cell.tileId;
+                    imageEl.setAttribute("src", `tiles/${tileset.tiles[tileId].image}`);
+                    rowEl.appendChild(imageEl);
+                }
+                else {
+                    const divEl = document.createElement("div");
+                    divEl.setAttribute("class", "blank")
+                    cell.options.forEach(
+                        tileId => {
+                            const iconEl = document.createElement("img");
+                            iconEl.setAttribute("src", `tiles/${tileset.tiles[tileId].image}`);
+                            divEl.appendChild(iconEl);
+                        }
+                    )
+                    rowEl.appendChild(divEl);
+                }
+            }
+            mapEl.appendChild(rowEl);
+        }
+        output.appendChild(mapEl);
+    }
+}
+
+
 const tileset = new Tileset();
 
 tileset.add(new Tile("leftbigstep", "leftbigsteptile.png"));
@@ -117,54 +168,10 @@ let example_map_3 = [
     [new Cell(tileset), new Cell("sky"), new Cell("sky")],
 ];
 
-function generateMap(map) {
-    const mapEl = document.createElement("div");
-    mapEl.setAttribute("class", "map");
-    const output = document.getElementById("generated-map");
-    for (let rowIndex = 0; rowIndex < map.length; rowIndex++) {
-        const rowEl = document.createElement("div");
-        rowEl.classList.add("row")
-        for (let cellIndex = 0; cellIndex < map[rowIndex].length; cellIndex++) {
-            const cell = map[rowIndex][cellIndex];
-            if (cell.resolved) {
-                const imageEl = document.createElement("img");
-                const tileId = cell.tileId;
-                imageEl.setAttribute("src", `tiles/${tileset.tiles[tileId].image}`);
-                rowEl.appendChild(imageEl);
-            }
-            else {
-                const divEl = document.createElement("div");
-                divEl.setAttribute("class", "blank")
-                cell.options.forEach(
-                    tileId => {
-                        const iconEl = document.createElement("img");
-                        iconEl.setAttribute("src", `tiles/${tileset.tiles[tileId].image}`);
-                        divEl.appendChild(iconEl);
-                    }
-                )
-                rowEl.appendChild(divEl);
-            }
-        }
-        mapEl.appendChild(rowEl);
-    }
-    output.appendChild(mapEl);
-}
-
-function growmap(numxtiles, numytiles, tileset) {
-    let outputmap = [];
-
-    for (y = 0; y < numytiles; y++) {
-        let rowarray = [];
-        outputmap.push(rowarray);
-        for (x = 0; x < numxtiles; x++) {
-            rowarray.push(new Cell(tileset));
-        }
-    }
-    return outputmap;
-}
-
-let unresolved_map = growmap(50, 30, tileset);
+let unresolved_map = new Worldmap(6, 5, tileset);
+let unresolved_map_2 = new Worldmap(3, 2, tileset);
 
 tileset.train(example_map);
 tileset.train(example_map_2);
-generateMap(unresolved_map);
+unresolved_map.display();
+unresolved_map_2.display();
