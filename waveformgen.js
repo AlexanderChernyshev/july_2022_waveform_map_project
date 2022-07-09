@@ -74,6 +74,11 @@ class Cell {
         }
 
     }
+    resolve() {
+        const randomIndex = Math.floor(Math.random() * (this.options.length))
+        this.tileId = this.options[randomIndex];
+        this.resolved = true;
+    }
 }
 
 class Worldmap {
@@ -124,6 +129,10 @@ class Worldmap {
         }
         output.appendChild(mapEl);
     }
+    resolvecell(cellX, cellY) {
+        const selectedCell = this.cells[cellY][cellX];
+        selectedCell.resolve();
+    }
 }
 
 
@@ -168,10 +177,10 @@ let example_map_3 = [
     [new Cell(tileset), new Cell("sky"), new Cell("sky")],
 ];
 
-let unresolved_map = new Worldmap(6, 5, tileset);
+let unresolved_map = new Worldmap(8, 7, tileset);
 let unresolved_map_2 = new Worldmap(3, 2, tileset);
 
 tileset.train(example_map);
 tileset.train(example_map_2);
+unresolved_map.resolvecell(0, 0);
 unresolved_map.display();
-unresolved_map_2.display();
