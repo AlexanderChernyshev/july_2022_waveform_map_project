@@ -132,9 +132,89 @@ class Worldmap {
     resolvecell(cellX, cellY) {
         const selectedCell = this.cells[cellY][cellX];
         selectedCell.resolve();
+        this.wave(cellX, cellY);
+    }
+    wave(cellX, cellY) {
+        const collapseQueue = [];
+        const processedCoordinates = [];
+        if (cellY > 0 && !this.cells[cellY - 1][cellX].resolved) {
+            collapseQueue.push([cellX, cellY - 1]);
+        }
+        if (cellY < (this.cells.length - 1) && !this.cells[cellY + 1][cellX].resolved) {
+            collapseQueue.push([cellX, cellY + 1]);
+        }
+        if (cellX > 0 && !this.cells[cellY][cellX - 1].resolved) {
+            collapseQueue.push([cellX - 1, cellY]);
+        }
+        if (cellX < (this.cells[cellY].length - 1) && !this.cells[cellY][cellX + 1].resolved) {
+            collapseQueue.push([cellX + 1, cellY]);
+        }
+        while (collapseQueue.length > 0) {
+            const coordinates = collapseQueue.shift();
+            if (this.collapse(coordinates[0], coordinates[1])) {
+                if (coordinates[1] > 0 &&
+                    !this.cells[coordinates[1] - 1][coordinates[0]].resolved &&
+                    !processedCoordinates.find(pair => {
+                        if (pair[0] === coordinates[0] && pair[1] === (coordinates[1] - 1)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    })
+                ) {
+                    collapseQueue.push([coordinates[0], coordinates[1] - 1]);
+                }
+                if (coordinates[1] < (this.cells.length - 1) &&
+                    !this.cells[coordinates[1] + 1][coordinates[0]].resolved &&
+                    !processedCoordinates.find(pair => {
+                        if (pair[0] === coordinates[0] && pair[1] === (coordinates[1] + 1)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    })
+                ) {
+                    collapseQueue.push([coordinates[0], coordinates[1] + 1]);
+                }
+                if (coordinates[0] > 0 &&
+                    !this.cells[coordinates[1]][coordinates[0] - 1].resolved &&
+                    !processedCoordinates.find(pair => {
+                        if (pair[0] === (coordinates[0] - 1) && pair[1] === coordinates[1]) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    })
+                ) {
+                    collapseQueue.push([coordinates[0] - 1, coordinates[1]]);
+                }
+                if (coordinates[0] < (this.cells[coordinates[1]].length - 1) &&
+                    !this.cells[coordinates[1]][coordinates[0] + 1].resolved &&
+                    !processedCoordinates.find(pair => {
+                        if (pair[0] === (coordinates[0] + 1) && pair[1] === coordinates[1]) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    })
+                ) {
+                    collapseQueue.push([coordinates[0] + 1, coordinates[1]]);
+                }
+            };
+            processedCoordinates.push(coordinates);
+        }
+    }
+    /**
+     * reduce possilbe tileids of cell based on neighbors. returns true if the possibilities of cell changed.
+     * @param {int} cellX 
+     * @param {int} cellY 
+     * @returns boolean
+     */
+    collapse(cellX, cellY) {
+        console.log(`trying to collapse ${cellX} ${cellY}`);
+        return true;
     }
 }
-
 
 const tileset = new Tileset();
 
@@ -182,5 +262,5 @@ let unresolved_map_2 = new Worldmap(3, 2, tileset);
 
 tileset.train(example_map);
 tileset.train(example_map_2);
-unresolved_map.resolvecell(0, 0);
+unresolved_map.resolvecell(5, 5);
 unresolved_map.display();

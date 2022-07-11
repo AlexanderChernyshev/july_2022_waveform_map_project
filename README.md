@@ -11,5 +11,5 @@ This project is an exercise in creating a wave function collapse algorithm. It w
 - [ ] a method that resolves an entire map
 - [ ] limit maps on the webpage to one, add ui to page that allows you to select map size and a "generate" button.
 - [ ] animate the process of drawing the map on the webpage.
-- [ ] add a tileset selection button
+- [ ] add a tileset selection button.
 - [ ] add a way to upload tilesets and algorithm training maps.
