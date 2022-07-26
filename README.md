@@ -9,6 +9,11 @@ This project is an exercise in creating a wave function collapse algorithm. It w
 - [x] function to grow maps of different sizes, then refactor to a map class with a method for growing a map and a method for displaying the resulting map. modify styling to keep multiple maps separate.
 - [x] a method of the map class that resolves one tile
 - [ ] a method that resolves an entire map
+    - [x] look for cell that contains the lowest amount of possibilities (entropy).
+    - [x] collapse that tile. `collapseCell()`.
+    - [ ] propagate consequences of previous collapse to surrounding tiles based on tile restricitons.
+    - [ ] repeat propagation until entire map has propagated.
+    - [ ] repeat from first step until no uncollapsed cells remain.
 - [ ] limit maps on the webpage to one, add ui to page that allows you to select map size and a "generate" button.
 - [ ] animate the process of drawing the map on the webpage.
 - [ ] add a tileset selection button.

@@ -58,15 +58,21 @@ class Tileset {
 
 }
 class Cell {
+    /**
+     * 
+     * @param {string | Tileset} input 
+     */
     constructor(input) {
         if (typeof input == "string") {
             this.resolved = true;
             this.tileId = input;
         }
         else if (typeof input == "object") {
-            /* @TODO populate the list of options */
             this.resolved = false;
-            this.options = Object.keys(input.tiles)
+            /**
+             * this.options contains tiles this cell can become.
+             */
+            this.options = Object.keys(input.tiles);
 
         }
         else {
@@ -85,7 +91,7 @@ class Worldmap {
     constructor(numxtiles, numytiles, tileset) {
 
         let outputmap = [];
-
+        this.tileset = tileset;
         for (let y = 0; y < numytiles; y++) {
             let rowarray = [];
             outputmap.push(rowarray);
@@ -93,6 +99,10 @@ class Worldmap {
                 rowarray.push(new Cell(tileset));
             }
         }
+        /**
+         * cells is an 2d array that represents the map.
+         * each item in this array is a "Cell" object.
+         */
         this.cells = outputmap;
     }
 
@@ -129,91 +139,125 @@ class Worldmap {
         }
         output.appendChild(mapEl);
     }
-    resolvecell(cellX, cellY) {
+    collapseCell(cellX, cellY) {
         const selectedCell = this.cells[cellY][cellX];
         selectedCell.resolve();
-        this.wave(cellX, cellY);
     }
-    wave(cellX, cellY) {
-        const collapseQueue = [];
-        const processedCoordinates = [];
-        if (cellY > 0 && !this.cells[cellY - 1][cellX].resolved) {
-            collapseQueue.push([cellX, cellY - 1]);
-        }
-        if (cellY < (this.cells.length - 1) && !this.cells[cellY + 1][cellX].resolved) {
-            collapseQueue.push([cellX, cellY + 1]);
-        }
-        if (cellX > 0 && !this.cells[cellY][cellX - 1].resolved) {
-            collapseQueue.push([cellX - 1, cellY]);
-        }
-        if (cellX < (this.cells[cellY].length - 1) && !this.cells[cellY][cellX + 1].resolved) {
-            collapseQueue.push([cellX + 1, cellY]);
-        }
-        while (collapseQueue.length > 0) {
-            const coordinates = collapseQueue.shift();
-            if (this.collapse(coordinates[0], coordinates[1])) {
-                if (coordinates[1] > 0 &&
-                    !this.cells[coordinates[1] - 1][coordinates[0]].resolved &&
-                    !processedCoordinates.find(pair => {
-                        if (pair[0] === coordinates[0] && pair[1] === (coordinates[1] - 1)) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    })
-                ) {
-                    collapseQueue.push([coordinates[0], coordinates[1] - 1]);
+
+    /**
+     * Returns and tuple of the x and y coords. of lowest entropy cell on map.
+     * @returns integer []
+     */
+    findLowEntropyCell() {
+
+        /**
+         * loop thru 2d array
+         * keep lowest possibilities cell # and coordinates of that cell.
+         */
+        let tilesLength = Object.keys(tileset.tiles).length;
+        let lowestPoss = tilesLength + 1;
+        let latestXCoord;
+        let latestYCoord;
+
+        for (let rowIndex = 0; rowIndex < this.cells.length; rowIndex++) {
+            let row = this.cells[rowIndex];
+            for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
+                let cell = row[columnIndex];
+                if (cell.options.length < lowestPoss && !cell.resolved) {
+                    lowestPoss = cell.options.length;
+                    latestXCoord = columnIndex;
+                    latestYCoord = rowIndex;
                 }
-                if (coordinates[1] < (this.cells.length - 1) &&
-                    !this.cells[coordinates[1] + 1][coordinates[0]].resolved &&
-                    !processedCoordinates.find(pair => {
-                        if (pair[0] === coordinates[0] && pair[1] === (coordinates[1] + 1)) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    })
-                ) {
-                    collapseQueue.push([coordinates[0], coordinates[1] + 1]);
-                }
-                if (coordinates[0] > 0 &&
-                    !this.cells[coordinates[1]][coordinates[0] - 1].resolved &&
-                    !processedCoordinates.find(pair => {
-                        if (pair[0] === (coordinates[0] - 1) && pair[1] === coordinates[1]) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    })
-                ) {
-                    collapseQueue.push([coordinates[0] - 1, coordinates[1]]);
-                }
-                if (coordinates[0] < (this.cells[coordinates[1]].length - 1) &&
-                    !this.cells[coordinates[1]][coordinates[0] + 1].resolved &&
-                    !processedCoordinates.find(pair => {
-                        if (pair[0] === (coordinates[0] + 1) && pair[1] === coordinates[1]) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    })
-                ) {
-                    collapseQueue.push([coordinates[0] + 1, coordinates[1]]);
-                }
-            };
-            processedCoordinates.push(coordinates);
+
+            }
+
         }
+
+        return [latestXCoord, latestYCoord];
     }
+
+
+
+    // wave(cellX, cellY) {
+    //     const collapseQueue = [];
+    //     const processedCoordinates = [];
+    //     if (cellY > 0 && !this.cells[cellY - 1][cellX].resolved) {
+    //         collapseQueue.push([cellX, cellY - 1]);
+    //     }
+    //     if (cellY < (this.cells.length - 1) && !this.cells[cellY + 1][cellX].resolved) {
+    //         collapseQueue.push([cellX, cellY + 1]);
+    //     }
+    //     if (cellX > 0 && !this.cells[cellY][cellX - 1].resolved) {
+    //         collapseQueue.push([cellX - 1, cellY]);
+    //     }
+    //     if (cellX < (this.cells[cellY].length - 1) && !this.cells[cellY][cellX + 1].resolved) {
+    //         collapseQueue.push([cellX + 1, cellY]);
+    //     }
+    //     while (collapseQueue.length > 0) {
+    //         const coordinates = collapseQueue.shift();
+    //         if (this.collapse(coordinates[0], coordinates[1])) {
+    //             if (coordinates[1] > 0 &&
+    //                 !this.cells[coordinates[1] - 1][coordinates[0]].resolved &&
+    //                 !processedCoordinates.find(pair => {
+    //                     if (pair[0] === coordinates[0] && pair[1] === (coordinates[1] - 1)) {
+    //                         return true;
+    //                     } else {
+    //                         return false;
+    //                     }
+    //                 })
+    //             ) {
+    //                 collapseQueue.push([coordinates[0], coordinates[1] - 1]);
+    //             }
+    //             if (coordinates[1] < (this.cells.length - 1) &&
+    //                 !this.cells[coordinates[1] + 1][coordinates[0]].resolved &&
+    //                 !processedCoordinates.find(pair => {
+    //                     if (pair[0] === coordinates[0] && pair[1] === (coordinates[1] + 1)) {
+    //                         return true;
+    //                     } else {
+    //                         return false;
+    //                     }
+    //                 })
+    //             ) {
+    //                 collapseQueue.push([coordinates[0], coordinates[1] + 1]);
+    //             }
+    //             if (coordinates[0] > 0 &&
+    //                 !this.cells[coordinates[1]][coordinates[0] - 1].resolved &&
+    //                 !processedCoordinates.find(pair => {
+    //                     if (pair[0] === (coordinates[0] - 1) && pair[1] === coordinates[1]) {
+    //                         return true;
+    //                     } else {
+    //                         return false;
+    //                     }
+    //                 })
+    //             ) {
+    //                 collapseQueue.push([coordinates[0] - 1, coordinates[1]]);
+    //             }
+    //             if (coordinates[0] < (this.cells[coordinates[1]].length - 1) &&
+    //                 !this.cells[coordinates[1]][coordinates[0] + 1].resolved &&
+    //                 !processedCoordinates.find(pair => {
+    //                     if (pair[0] === (coordinates[0] + 1) && pair[1] === coordinates[1]) {
+    //                         return true;
+    //                     } else {
+    //                         return false;
+    //                     }
+    //                 })
+    //             ) {
+    //                 collapseQueue.push([coordinates[0] + 1, coordinates[1]]);
+    //             }
+    //         };
+    //         processedCoordinates.push(coordinates);
+    //     }
+    // }
     /**
      * reduce possilbe tileids of cell based on neighbors. returns true if the possibilities of cell changed.
      * @param {int} cellX 
      * @param {int} cellY 
      * @returns boolean
      */
-    collapse(cellX, cellY) {
-        console.log(`trying to collapse ${cellX} ${cellY}`);
-        return true;
-    }
+    // collapse(cellX, cellY) {
+    //     console.log(`trying to collapse ${cellX} ${cellY}`);
+    //     return true;
+    // }
 }
 
 const tileset = new Tileset();
@@ -262,5 +306,8 @@ let unresolved_map_2 = new Worldmap(3, 2, tileset);
 
 tileset.train(example_map);
 tileset.train(example_map_2);
-unresolved_map.resolvecell(5, 5);
+let nextcell = unresolved_map.findLowEntropyCell();
+unresolved_map.collapseCell(nextcell[0], nextcell[1]);
+nextcell = unresolved_map.findLowEntropyCell();
+unresolved_map.collapseCell(nextcell[0], nextcell[1]);
 unresolved_map.display();
